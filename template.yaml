@@ -12,6 +12,20 @@ Globals:
     MemorySize: 128
 
 Resources:
+  EmergencyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Emergency
+      AttributeDefinitions:
+        - AttributeName: lastName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: lastName
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -20,12 +34,31 @@ Resources:
       Runtime: python3.9
       Architectures:
       - x86_64
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: 
+              !Ref EmergencyTable
+        - DynamoDBReadPolicy:
+            TableName: 
+              !Ref EmergencyTable
+  
+
       Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        # HelloWorld:
+        #   Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        #   Properties:
+        #     Path: /hello
+        #     Method: get
+        PutEmergency:
+          Type: Api
           Properties:
-            Path: /hello
-            Method: get
+            Path: /Emergency
+            Method: post
+        # ListEmergencies:
+        #   Type: Api
+        #   Properties:
+        #     Path: /Emergencies
+        #     Method: get
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
